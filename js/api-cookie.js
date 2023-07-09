@@ -5,7 +5,6 @@ class APIClient {
     }
 
     static reset() {
-        localStorage.removeItem('jwtToken');
         localStorage.removeItem('sessionId');
     }
 
@@ -14,7 +13,8 @@ class APIClient {
      */
     async getNonceMessage(walletAddress) {
         const response = await fetch(this.apiURL + "auth/nonce/" + walletAddress, {
-            method: "GET"
+            method: "GET",
+            credentials: 'include'  // Include cookies in the request
         });
         if (!response.ok) {
             throw new Error("Failed to get message to sign");
@@ -25,13 +25,9 @@ class APIClient {
     }
 
     /**
-     * Authenticates the wallet with the server, and if successful, returns a JWT token
-     * @returns JWT Token
+     * Authenticates the wallet with the server
      */
     async authenticate() {       
-        let existingToken = localStorage.getItem('jwtToken');
-        if (existingToken) return existingToken;
-
         if (!window.ethereum || !window.ethereum.isMetaMask) {
           throw new Error('MetaMask not installed');
         }
@@ -45,8 +41,6 @@ class APIClient {
           method: 'personal_sign',
           params: [message, address]
         });
-
-        console.log("Signature: " + signature);
     
         const response = await fetch(this.apiURL + "auth/verify", {
           method: "POST",
@@ -57,7 +51,8 @@ class APIClient {
             address,
             signature,
             message
-          })
+          }),
+          credentials: 'include'  // Include cookies in the request
         });
     
         if (!response.ok) {
@@ -65,11 +60,6 @@ class APIClient {
             const errorResponse = await response.json();
             throw new Error(errorResponse.error || "Failed to authenticate");
         }
-
-        const data = await response.json();
-        this.token = data.token;
-        localStorage.setItem('jwtToken', this.token);
-        return this.token;
     }
 
     async getSessionId() {
@@ -82,9 +72,7 @@ class APIClient {
         try {
             const response = await fetch(this.apiURL + "chat/new-session", {
                 method: "GET",
-                headers: {
-                    Authorization: `Bearer ${this.token}`  // Using the getter here
-                }
+                credentials: 'include'  // Include cookies in the request
             });
 
             if (!response.ok) {
@@ -100,42 +88,14 @@ class APIClient {
         }
     }
 
-    sendMessage(sessionId, message, callback) {
-        console.log("Sending message: " + message + " to session: " + sessionId + " with token: " + this.token);
-        this.postRequestSSE(`${this.apiURL}chat/message`, { sessionId, message }, callback);
-    }
-
-    postRequestSSE(url, data, callback) {
-        // Make the initial POST request
-        fetch(url, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'text/event-stream', // Ensure we're accepting an SSE stream in the response
-            'Authorization': `Bearer ${this.token}` 
-          },
-          body: JSON.stringify(data),
-        })
-        .then(response => {
-          if(response.headers.get("Content-Type")?.includes("text/event-stream")){
-              // The response is an SSE stream
-              const reader = response.body?.getReader();
-              if (!reader) return;
-    
-              const decoder = new TextDecoder();
-              return reader.read().then(function processText({ done, value }) {
-                  if (done) return;
-                  var decoded = decoder.decode(value);
-                  callback(decoded.split('data: "')[1].split('"')[0]);
-                  return reader.read().then(processText);
-              });
-          } else {
-            // The response is a regular JSON response
-            return response.json();
-          }
-        })
-        .catch((error) => {
-          console.error('Error:', error);
-        });
+    sendMessage(sessionId, message) {
+        console.log("Sending message: " + message + " to session: " + sessionId);
+        const eventSource = new EventSource(
+            `${this.apiURL}chat/message?sessionId=${encodeURIComponent(sessionId)}&message=${encodeURIComponent(message)}`,
+            { withCredentials: true }  // Include cookies in the request
+        );
+        return eventSource;
     }
 }
+
+

@@ -24,28 +24,34 @@ class ChatSession {
 
     sendMessage(message) {
         this.messages.push(new Message(message, "human"));
-        const eventSource = this.api.sendMessage(this.sessionId, message);
-        
         const replyMessage = new Message("", "ai");
         this.messages.push(replyMessage);
 
-        eventSource.onmessage = (event) => {
-            if (event.data !== 'null') {
-                replyMessage.addToMessage(event.data.replaceAll('"', ""));
-                this.render();
-            }
-        };
+        this.api.sendMessage(this.sessionId, message, (text) => {
+            console.log("GOT RESPONSE");
+            console.log("Received message: " + text);
+            replyMessage.addToMessage(text);
+            this.render();
+        });
+        
 
-        eventSource.addEventListener('close', function(event) {
-            console.log('Received close event');
-            intentionalClose = true;
-            eventSource.close();
-        }, false);
+        // eventSource.onmessage = (event) => {
+        //     if (event.data !== 'null') {
+        //         replyMessage.addToMessage(event.data.replaceAll('"', ""));
+        //         this.render();
+        //     }
+        // };
 
-        eventSource.onerror = (error) => {
-            console.log('EventSource failed: ', error);
-            eventSource.close();
-        };
+        // eventSource.addEventListener('close', function(event) {
+        //     console.log('Received close event');
+        //     intentionalClose = true;
+        //     eventSource.close();
+        // }, false);
+
+        // eventSource.onerror = (error) => {
+        //     console.log('EventSource failed: ', error);
+        //     eventSource.close();
+        // };
     }
 
     render(element = "#chat-body") {

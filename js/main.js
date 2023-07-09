@@ -23,14 +23,14 @@ $(document).ready(function() {
 
     $("#connect-btn").click(function() {
         console.log("Connect button clicked");
-        if (window.chatSession === null) {
-            ChatSession.create().then((session) => {
+        APIClient.reset();
+        ChatSession.create(new APIClient(window.env.API_URL))
+            .then((session) => {
                 window.chatSession = session;
-                console.log("Created chat session");
+                session.sendMessage("Hello");
             }).catch((error) => {
                 console.log("Error: " + error);
             });
-        }
     });
 
 });
