@@ -123,10 +123,29 @@ class APIClient {
               if (!reader) return;
     
               const decoder = new TextDecoder();
+              let messageData = "";
+
               return reader.read().then(function processText({ done, value }) {
                   if (done) return;
-                  var decoded = decoder.decode(value);
-                  callback(decoded.split('data: "')[1].split('"')[0]);
+
+                  // var decoded = decoder.decode(value);
+                  messageData += decoder.decode(value, {stream: true});
+
+                  let messageEndIndex = messageData.indexOf("\n\n");
+                  if (messageEndIndex !== -1) {
+                    let fullMessage = messageData.substring(0, messageEndIndex + 2);
+                    messageData = messageData.substring(messageEndIndex + 2);
+                    
+                    let lines = fullMessage.split('\n');
+                    lines.forEach(line => {
+                        if (line.startsWith('data: ')) {
+                            let eventData = JSON.parse(line.slice(6));
+                            callback(eventData);
+                        }
+                    });
+                  }
+
+                  // callback(decoded.split('data: "')[1].split('"')[0]);
                   return reader.read().then(processText);
               });
           } else {
