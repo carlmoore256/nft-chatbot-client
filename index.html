@@ -10,6 +10,11 @@
 
 <body>
     <div class="chat-container">
+        <div class="connect-wallet-wrapper">
+            <div class="connect-wallet">
+                <button id="connect-btn"><span>Connect Wallet</span></button>
+            </div>
+        </div>
         <div class="chat-body" id="chat-body" style="padding: 10px">
         </div>
         <div class="chat-header">
@@ -24,6 +29,9 @@
         </div>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <!-- Load your environment variables here -->
+    <script src="env.js"></script> 
     
     <script src="js/message.js"></script>
     <script src="js/api.js"></script>

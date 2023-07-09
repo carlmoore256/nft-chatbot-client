@@ -15,12 +15,11 @@ class ChatSession {
     }
 
     // can create a new session whether or not it already exists on the server
-    static async create() {
-        const api = new APIClient();
-        await api.authenticate(); // will try to authenticate, if it hasn't already
-        const sessionId = await api.getSessionId(); // gets a session id from the api
-        console.log("Session ID: " + sessionId + " API Token: " + api.token);
-        return new ChatSession(sessionId, api); 
+    static async create(apiClient) {
+        await apiClient.authenticate(); // will try to authenticate, if it hasn't already
+        const sessionId = await apiClient.getSessionId(); // gets a session id from the api
+        console.log("Session ID: " + sessionId + " API Token: " + apiClient.token);
+        return new ChatSession(sessionId, apiClient); 
     }
 
     sendMessage(message) {
