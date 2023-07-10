@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
 * {
     margin: 0;
     padding: 0;
@@ -5,7 +7,7 @@
 }
 
 body {
-    /* background-color: #1d1d1d; */
+    font-family: 'Roboto', sans-serif;
     background: linear-gradient(60deg, #0d1018, #26232c);
     display: flex;
     align-items: center;
@@ -14,13 +16,88 @@ body {
     margin: 0;
 }
 
+.top-bar {
+    width: calc(100% - 2*10px); /* subtract double the desired padding from width */
+    /* box-sizing: border-box; */
+    padding: 0 20px;
+    font-size: 1em;
+    color: #fff;
+    
+    height: 60px;
+    background-color: #ffffff15;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    position: absolute;
+    top: 10px;
+}
+
+.top-bar h3 {
+    margin-right: 1em; /* Add some space to the right of the heading */
+}
+
+.box {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.left {
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    padding: 15px;
+}
+
+.right {
+    display: flex;
+    align-items: center;
+    justify-content: right;
+    padding: 15px;
+}
+
+.connection-status {
+    display: flex;
+    align-items: center;
+    margin-left: auto; /* Push the user-info to the right */
+}
+
+.wallet-status {
+    display: flex;
+    align-items: center;
+}
+
+.status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.status-text {
+    font-size: 12px;
+}
+
+.not-connected {
+    background-color: red;
+}
+
+.connected {
+    background-color: green;
+}
+
+
 .connect-wallet-wrapper {
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100%;
     width: 100%;
     padding: 20%;
+    background-color: #0d1018;
 }
 
 .connect-wallet {
@@ -37,7 +114,7 @@ body {
     flex-direction: column;
 }
 
-.connect-wallet button {
+.fancy button {
     position: relative;
     background: linear-gradient(90deg, rgba(37,200,255,1) 0%, rgba(123,58,150,1) 100%);
     border: none;
@@ -51,9 +128,10 @@ body {
     cursor: pointer;
     border-radius: 4px;
     overflow: hidden;
+    outline: none;
 }
 
-.connect-wallet button::before {
+.fancy button::before {
     content: "";
     position: absolute;
     top: 0;
@@ -65,16 +143,16 @@ body {
     transition: all .5s;
 }
 
-.connect-wallet button:hover::before {
+.fancy button:hover::before {
     opacity: 1;
 }
 
-.connect-wallet button:hover {
+.fancy button:hover {
     box-shadow: 0 15px 25px rgba(0,0,0,.1);
     transform: scale(1.05);
 }
 
-.connect-wallet button span {
+.fancy button span {
     position: relative;
     z-index: 1;
 }
@@ -176,4 +254,38 @@ body {
     padding: 10px;
     color: #fff;
     font-size: 16px;
+}
+
+
+#btn-reset {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #585eb6;
+    color: #ffffff;
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    cursor: pointer;
+    transition-duration: 300ms;
+    outline: none;
+    opacity: 30%;
+}
+
+#btn-reset:hover {
+    background: #767786;
+    box-shadow: 0 15px 25px rgba(0,0,0,.1);
+    /* transform: scale(0 1.5); */
+    width: 60px;
+    border-radius: 10px;
+    opacity: 100%;
+}
+
+#btn-reset:active {
+    box-shadow: 0 0 4px #585eb6;
 }

@@ -1,3 +1,5 @@
+import { WalletConnection } from "./wallet";
+
 class APIClient {
 
     constructor(apiURL) {
@@ -31,23 +33,10 @@ class APIClient {
     async authenticate() {       
         let existingToken = localStorage.getItem('jwtToken');
         if (existingToken) return existingToken;
-
-        if (!window.ethereum || !window.ethereum.isMetaMask) {
-          throw new Error('MetaMask not installed');
-        }
-    
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        const address = accounts[0]; // The first account in MetaMask
-        this.walletAddress = address;
+        await WalletConnection.connect();
+        const address = WalletConnection.address;
         const message = await this.getNonceMessage(address);
-    
-        const signature = await window.ethereum.request({
-          method: 'personal_sign',
-          params: [message, address]
-        });
-
-        console.log("Signature: " + signature);
-    
+        const signature = await WalletConnection.signMessage(message);
         const response = await fetch(this.apiURL + "auth/verify", {
           method: "POST",
           headers: {
@@ -59,13 +48,10 @@ class APIClient {
             message
           })
         });
-    
         if (!response.ok) {
-            // Capture the error message from the server
             const errorResponse = await response.json();
             throw new Error(errorResponse.error || "Failed to authenticate");
         }
-
         const data = await response.json();
         this.token = data.token;
         localStorage.setItem('jwtToken', this.token);
@@ -98,6 +84,27 @@ class APIClient {
         } catch (error) {
             throw new Error(error);
         }
+    }
+
+    
+    async loadSession(sessionId) {
+      try {
+          const response = await fetch(this.apiURL + "chat/load-session/" + `?sessionId=${sessionId}`, {
+              method: "GET",
+              headers: {
+                  Authorization: `Bearer ${this.token}`
+              }
+          });
+
+          if (!response.ok) {
+              throw new Error("Failed to load the existing session");
+          }
+
+          const data = await response.json();
+          return data; // server should return session data here
+      } catch (error) {
+          throw new Error(error);
+      }
     }
 
     sendMessage(sessionId, message, callback) {
@@ -158,3 +165,5 @@ class APIClient {
         });
     }
 }
+
+export default APIClient;

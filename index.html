@@ -6,13 +6,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
+    <!-- <style>@import "./styles.css";</style> -->
 </head>
 
 <body>
+    <div class="top-bar">
+        <div class="box left">
+            <h3 id="page-title">NFT Chat</h3>
+
+        </div>
+        <div class="box right">
+
+            <div class="connection-status">
+                <div id="wallet-status" class="wallet-status">
+                    <div class="status-indicator not-connected"></div>
+                    <div class="status-text">Wallet Not Connected</div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
     <div class="chat-container">
+        
         <div class="connect-wallet-wrapper">
-            <div class="connect-wallet">
-                <button id="connect-btn"><span>Connect Wallet</span></button>
+            
+            <button id="btn-reset">&#x21bb;</button>
+
+            <div class="connect-wallet fancy">
+                <button id="btn-connect"><span>Connect Wallet</span></button>
             </div>
         </div>
         <div class="chat-body" id="chat-body" style="padding: 10px">
@@ -32,12 +54,6 @@
 
     <!-- Load your environment variables here -->
     <script src="env.js"></script> 
-    
-    <script src="js/message.js"></script>
-    <script src="js/api.js"></script>
-    <script src="js/chat.js"></script>
-    <script src="js/main.js"></script>
-
-    <!-- <script src="testing/test-functions.js"></script> -->
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>

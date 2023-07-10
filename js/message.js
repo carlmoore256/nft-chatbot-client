@@ -1,4 +1,26 @@
-class MessageHistory {
+
+export class Message {
+    
+    constructor(message, sender) {
+        this.message = message;
+        this.sender = sender;
+    }
+
+    addToMessage(text) {
+        this.message += text;
+    }
+
+    render() {
+        var senderClass = "chat-message-sent";
+        if (this.sender == "ai") {
+            senderClass = "chat-message-received";
+        }
+        var formattedMessage = this.message.replace(/\\n/g, '\n').replace(/\n/g, '<br>'); 
+        return `<div class="chat-bubble ` + senderClass + '">' + formattedMessage + '</div>';
+    }
+}
+
+export class MessageHistory {
     
     constructor() {
         this.messages = [];
@@ -22,26 +44,5 @@ class MessageHistory {
             html += this.messages[i].render();
         }
         $("#chat-body").html(html);
-    }
-}
-
-class Message {
-    
-    constructor(message, sender) {
-        this.message = message;
-        this.sender = sender;
-    }
-
-    addToMessage(text) {
-        this.message += text;
-    }
-
-    render() {
-        var senderClass = "chat-message-sent";
-        if (this.sender == "ai") {
-            senderClass = "chat-message-received";
-        }
-        var formattedMessage = this.message.replace(/\\n/g, '\n').replace(/\n/g, '<br>'); 
-        return `<div class="chat-bubble ` + senderClass + '">' + formattedMessage + '</div>';
     }
 }

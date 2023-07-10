@@ -1,5 +1,6 @@
+import { Message } from './message.js';
 
-class ChatSession {
+export class ChatSession {
 
     messages = [];
 
@@ -15,12 +16,28 @@ class ChatSession {
     }
 
     // can create a new session whether or not it already exists on the server
+    // static async create(apiClient) {
+    //     await apiClient.authenticate(); // will try to authenticate, if it hasn't already
+    //     const sessionId = await apiClient.getSessionId(); // gets a session id from the api
+    //     console.log("Session ID: " + sessionId + " API Token: " + apiClient.token);
+    //     return new ChatSession(sessionId, apiClient); 
+    // }
     static async create(apiClient) {
-        await apiClient.authenticate(); // will try to authenticate, if it hasn't already
-        const sessionId = await apiClient.getSessionId(); // gets a session id from the api
-        console.log("Session ID: " + sessionId + " API Token: " + apiClient.token);
-        return new ChatSession(sessionId, apiClient); 
+        await apiClient.authenticate();
+        const existingSessionId = localStorage.getItem('sessionId');
+        if (existingSessionId) {
+            // Load existing session from server
+            await apiClient.loadSession(existingSessionId);
+            console.log("Loaded existing session ID: " + existingSessionId);
+            return new ChatSession(existingSessionId, apiClient);
+        } else {
+            // Create new session
+            const sessionId = await apiClient.getSessionId();
+            console.log("Created new session ID: " + sessionId);
+            return new ChatSession(sessionId, apiClient); 
+        }
     }
+
 
     sendMessage(message) {
         this.messages.push(new Message(message, "human"));
@@ -28,30 +45,9 @@ class ChatSession {
         this.messages.push(replyMessage);
 
         this.api.sendMessage(this.sessionId, message, (text) => {
-            console.log("GOT RESPONSE");
-            console.log("Received message: " + text);
             replyMessage.addToMessage(text);
             this.render();
         });
-        
-
-        // eventSource.onmessage = (event) => {
-        //     if (event.data !== 'null') {
-        //         replyMessage.addToMessage(event.data.replaceAll('"', ""));
-        //         this.render();
-        //     }
-        // };
-
-        // eventSource.addEventListener('close', function(event) {
-        //     console.log('Received close event');
-        //     intentionalClose = true;
-        //     eventSource.close();
-        // }, false);
-
-        // eventSource.onerror = (error) => {
-        //     console.log('EventSource failed: ', error);
-        //     eventSource.close();
-        // };
     }
 
     render(element = "#chat-body") {
