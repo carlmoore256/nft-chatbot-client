@@ -180,6 +180,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 5px;
+    justify-content: flex-end;
 }
 
 .chat-form {
