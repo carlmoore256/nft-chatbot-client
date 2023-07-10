@@ -141,7 +141,7 @@ class APIClient {
             }
 
             const data = await response.json();
-            return data; // server should return session data here
+            return data.history; // server should return session data here
         } catch (error) {
             throw new Error(error);
         }
@@ -151,14 +151,6 @@ class APIClient {
         if (!this.token) {
             throw new Error("Not authenticated");
         }
-        console.log(
-            "Sending message: " +
-                message +
-                " to session: " +
-                sessionId +
-                " with token: " +
-                this.token
-        );
         this.postRequestSSE(
             `${this.apiURL}chat/message`,
             { sessionId, message },

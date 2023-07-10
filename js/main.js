@@ -15,26 +15,6 @@ async function sendMessage(message) {
     return false;
 }
 
-// function toggleWalletStatus(isConnected) {
-//     console.log("Is wallet connected?: " + isConnected);
-//     const walletStatus = $("#wallet-status");
-//     const statusIndicator = walletStatus.find(".status-indicator");
-//     const statusText = walletStatus.find(".status-text");
-//     if (isConnected) {
-//         statusIndicator.removeClass("disconnected");
-//         statusIndicator.addClass("connected");
-//         statusText.html("Connected");
-//         $("#btn-connect").hide();
-//     } else {
-//         statusIndicator.removeClass("connected");
-//         statusIndicator.addClass("disconnected");
-//         statusText.html("Disconnected");
-//         $("#btn-connect").show();
-//     }
-// }
-
-
-
 $(document).ready(function() {
     
     ChatUI.enableSubmitButton(false);
@@ -61,41 +41,18 @@ $(document).ready(function() {
     // will only be visible if WalletConnection is not connected
     $("#btn-connect").click(async() => {
         await WalletConnection.connect();
+        WalletUI.toggleWalletStatus(WalletConnection.isConnected);
         const api = new APIClient(window.env.API_URL);
         await api.authenticate();
         window.chatSession = await ChatSession.createOrLoad(api);
-        WalletUI.toggleWalletStatus(WalletConnection.isConnected);
     });
 
     $("#btn-reset").click(() => {
         console.log("Reset button clicked");
         localStorage.removeItem('sessionId');
-        localStorage.removeItem('jwtToken');
-        localStorage.removeItem('walletAddress');
-        window.chatSession = null;
+        // localStorage.removeItem('jwtToken');
+        // localStorage.removeItem('walletAddress');
+        window.chatSession.reset(() => window.chatSession = null);
     })
 
 });
-
-// WalletConnection.addListener((address, isConnected) => {
-//     toggleWalletStatus(isConnected);
-//     if (isConnected) {
-//         initializeChatSession();
-//     }
-// });
-// if (localStorage.getItem('jwtToken')) {
-//     $("#btn-connect").hide();
-// } else {
-//     $("#btn-connect").click(function() {
-//         console.log("Connect button clicked");
-//         // APIClient.reset();
-//         ChatSession.create(new APIClient(window.env.API_URL))
-//             .then((session) => {
-//                 window.chatSession = session;
-//                 // hide the btn-connect
-//                 $("#btn-connect").hide();
-//             }).catch((error) => {
-//                 console.log("Error: " + error);
-//             });
-//     });
-// }

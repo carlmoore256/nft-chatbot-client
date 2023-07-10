@@ -1,9 +1,11 @@
+import { generateId } from "./utils";
 
 export class Message {
     
-    constructor(message, sender) {
+    constructor(message, role , id = null) {
         this.message = message;
-        this.sender = sender;
+        this.role = role;
+        this.id = id || generateId(16);        
     }
 
     addToMessage(text) {
@@ -12,37 +14,19 @@ export class Message {
 
     render() {
         var senderClass = "chat-message-sent";
-        if (this.sender == "ai") {
+        if (this.role == "ai") {
             senderClass = "chat-message-received";
         }
         var formattedMessage = this.message.replace(/\\n/g, '\n').replace(/\n/g, '<br>'); 
-        return `<div class="chat-bubble ` + senderClass + '">' + formattedMessage + '</div>';
-    }
-}
-
-export class MessageHistory {
-    
-    constructor() {
-        this.messages = [];
+        return `<div id=${this.id} class="chat-bubble ` + senderClass + '">' + formattedMessage + '</div>';
     }
 
-    addMessage(message) {
-        this.messages.push(message);
-        this.render();
-    }
-
-    getMessages(limit=null) {
-        if (limit !== null) {
-            return this.messages.slice(this.messages.length - limit, -1);
-        }
-        return this.messages;
-    }
-
-    render() {
-        var html = "";
-        for (let i = 0; i < this.messages.length; i++) {
-            html += this.messages[i].render();
-        }
-        $("#chat-body").html(html);
+    remove() {
+        const messageElement = $(`#${this.id}`);
+        messageElement.css('animation', 'fade-out 1s forwards');
+        messageElement.on('animationend', () => {
+            console.log(`Animation ended!: $s{this.message} | ${this.role}`)
+            messageElement.remove();
+        });
     }
 }
