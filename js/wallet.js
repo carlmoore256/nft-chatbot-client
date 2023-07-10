@@ -1,13 +1,34 @@
 export class WalletConnection {
     
-    static address = null;
+    // static address = null;
     static connectionListeners = [];
 
+    static get address() {
+        const address = localStorage.getItem('walletAddress');
+        if (address) {
+            return address
+        }
+        return null;
+    }
+
+    static set address(address) {
+        if (address) {
+            localStorage.setItem('walletAddress', address);
+        } else {
+            localStorage.removeItem('walletAddress');
+        }
+    }
+
+    
     static get wallet() {
         if (!window.ethereum || !window.ethereum.isMetaMask) {
             throw new Error('MetaMask not installed');
         }
         return window.ethereum;
+    }
+
+    static get isConnected() {
+        return this.address !== null;
     }
 
     static addListener(listener) {
@@ -44,3 +65,57 @@ export class WalletConnection {
         return signature;
     }
 }
+
+
+export class WalletUI {
+
+    static toggleConnectWalletOverlay(toggle) {
+        const overlay = $("#connect-wallet-overlay");
+        if (toggle) {
+            overlay.show();
+        } else {
+            console.log("Hiding overlay");
+            overlay.hide();
+        }
+    }
+
+
+    static toggleWalletStatus(toggle) {
+        const walletStatus = $("#wallet-status");
+        const statusIndicator = walletStatus.find(".status-indicator");
+        const statusText = walletStatus.find(".status-text");
+        if (toggle) {
+            statusIndicator.removeClass("disconnected");
+            statusIndicator.addClass("connected");
+            statusText.html("Connected");
+            this.toggleConnectWalletOverlay(false);
+        } else {
+            statusIndicator.removeClass("connected");
+            statusIndicator.addClass("disconnected");
+            statusText.html("Disconnected");
+            this.toggleConnectWalletOverlay(true);
+        }
+    }
+
+}
+
+
+
+    // constructor() {
+    //     console.log("WalletConnection constructor");
+    //     // When the page is about to be unloaded, save the state of the wallet
+    //     window.onbeforeunload = () => {
+    //         console.log("Saving state: " + this.address + " " + this.isConnected)
+    //         if (this.isConnected) {
+    //             localStorage.setItem('WalletConnection', JSON.stringify({ address: this.address }));
+    //         }
+    //     }
+
+    //     // When the page is loaded, restore the state of the wallet
+    //     const savedState = localStorage.getItem('WalletConnection');
+    //     console.log("Saved state: " + savedState);
+    //     if (savedState) {
+    //         const state = JSON.parse(savedState);
+    //         this.address = state.address;
+    //     }
+    // }

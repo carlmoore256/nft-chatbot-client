@@ -15,27 +15,24 @@ export class ChatSession {
         localStorage.setItem('sessionId', sessionId);
     }
 
-    // can create a new session whether or not it already exists on the server
-    // static async create(apiClient) {
-    //     await apiClient.authenticate(); // will try to authenticate, if it hasn't already
-    //     const sessionId = await apiClient.getSessionId(); // gets a session id from the api
-    //     console.log("Session ID: " + sessionId + " API Token: " + apiClient.token);
-    //     return new ChatSession(sessionId, apiClient); 
-    // }
-    static async create(apiClient) {
-        await apiClient.authenticate();
+    static async createOrLoad(apiClient) {
         const existingSessionId = localStorage.getItem('sessionId');
         if (existingSessionId) {
-            // Load existing session from server
-            await apiClient.loadSession(existingSessionId);
-            console.log("Loaded existing session ID: " + existingSessionId);
-            return new ChatSession(existingSessionId, apiClient);
+            return await ChatSession.load(apiClient, localStorage.getItem('sessionId'));
         } else {
-            // Create new session
-            const sessionId = await apiClient.getSessionId();
-            console.log("Created new session ID: " + sessionId);
-            return new ChatSession(sessionId, apiClient); 
+            return await ChatSession.create(apiClient);
         }
+    }
+    
+    static async create(apiClient) {
+        const sessionId = await apiClient.getSessionId();
+        console.log("Created new session ID: " + sessionId);
+        return new ChatSession(sessionId, apiClient); 
+    }
+
+    static async load(apiClient, sessionId) {
+        await apiClient.loadSession(sessionId);
+        return new ChatSession(sessionId, apiClient);
     }
 
 
@@ -57,4 +54,25 @@ export class ChatSession {
         }
         $(element).html(html);
     }
+
+
+}
+
+export class ChatUI {
+    
+    async sendMessage(message) {
+        if (window.chatSession === null) {
+            window.chatSession = await ChatSession.create(new APIClient(window.env.API_URL));
+        }
+        if (message.trim() == "") {
+            return false;
+        }
+        await window.chatSession.sendMessage(message);
+        return false;
+    }
+
+    static enableSubmitButton(isEnabled) {
+        $("#chat-submit").prop("disabled", !isEnabled);
+    }
+
 }
