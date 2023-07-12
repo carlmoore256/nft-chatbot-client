@@ -6,6 +6,13 @@ class APIClient {
         this.apiURL = apiURL;
     }
 
+    static get Instance() {
+        if (!window.apiClient) {
+            window.apiClient = new APIClient(window.env.API_URL);
+        }
+        return window.apiClient;
+    }
+
     static reset() {
         localStorage.removeItem("jwtToken");
         localStorage.removeItem("sessionId");
@@ -100,57 +107,69 @@ class APIClient {
         if (!this.token) {
             throw new Error("Not authenticated");
         }
-        try {
-            const response = await fetch(this.apiURL + "chat/new-session", {
-                method: "GET",
-                headers: {
-                    Authorization: `Bearer ${this.token}`, // Using the getter here
-                },
-            });
+        const response = await fetch(this.apiURL + "chat/new-session", {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${this.token}`, // Using the getter here
+            },
+        });
 
-            if (!response.ok) {
-                throw new Error("Failed to create a new session");
-            }
-
-            const data = await response.json();
-            const sessionId = data.sessionId;
-            localStorage.setItem("sessionId", sessionId);
-            return sessionId;
-        } catch (error) {
-            throw new Error(error);
+        if (!response.ok) {
+            throw new Error("Failed to create a new session");
         }
+
+        const data = await response.json();
+        const sessionId = data.sessionId;
+        localStorage.setItem("sessionId", sessionId);
+        return sessionId;
     }
 
     async loadSession(sessionId) {
         if (!this.token) {
             throw new Error("Not authenticated");
         }
-        try {
-            const response = await fetch(
-                this.apiURL + "chat/load-session/" + `?sessionId=${sessionId}`,
-                {
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${this.token}`,
-                    },
-                }
-            );
-
-            if (!response.ok) {
-                throw new Error("Failed to load the existing session");
+        const response = await fetch(
+            this.apiURL + "chat/load-session/" + `?sessionId=${sessionId}`,
+            {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${this.token}`,
+                },
             }
+        );
 
-            const data = await response.json();
-            return data.history; // server should return session data here
-        } catch (error) {
-            throw new Error(error);
+        if (!response.ok) {
+            throw new Error("Failed to load the existing session");
         }
+
+        const data = await response.json();
+        return data.history; // server should return session data here
     }
+
+    async listSessions() {
+        if (!this.token) {
+            throw new Error("Not authenticated");
+        }
+        const response = await fetch(this.apiURL + "chat/list-sessions", {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${this.token}`,
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to list sessions");
+        }
+        const data = await response.json();
+        return data.sessions;
+    }
+
 
     sendMessage(sessionId, message, callback) {
         if (!this.token) {
             throw new Error("Not authenticated");
         }
+        console.log(`Sending message to ${sessionId} | ${JSON.stringify({ sessionId, message })}`)
         this.postRequestSSE(
             `${this.apiURL}chat/message`,
             { sessionId, message },

@@ -10,13 +10,12 @@
 </head>
 
 <body>
-    <div class="top-bar">
+
+    <nav class="top-bar">
         <div class="box left">
             <h3 id="page-title">NFT Chat</h3>
-
         </div>
         <div class="box right">
-
             <div class="connection-status">
                 <div id="wallet-status" class="wallet-status">
                     <div class="status-indicator not-connected"></div>
@@ -24,7 +23,7 @@
                 </div>
             </div>        
         </div>
-    </div>
+    </nav>
 
     <div id="connect-wallet-overlay">
         <div class="connect-wallet fancy">
@@ -32,23 +31,29 @@
         </div>
     </div>
     
+    
     <div class="chat-container">
         
-        <button id="btn-reset">&#x21bb;</button>
+        <div class="chat-actions-top">
+            <button id="btn-open">=</button>
+            <button id="btn-reset">&#x21bb;</button>
+        </div>
+        
+        <div id="chat-selection-overlay">
+            <div id="selection-container">
+
+            </div>
+        </div>
         
         <div class="chat-body" id="chat-body" style="padding: 10px">
             <!-- chat messages here -->
         </div>
         
         <div class="chat-header">
-            <div class="chat-logo">
-                <div class="chat-logo-icon"></div>
-            </div>
             <form class="chat-form">
                 <input type="text" placeholder="Type a message..." id="user-input" autocomplete="off" >
                 <button type="submit" id="btn-submit">Send</button>
             </form>
-            <div id="thinking-status"></div>
         </div>
         
     </div>

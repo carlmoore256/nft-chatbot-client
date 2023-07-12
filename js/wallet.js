@@ -98,24 +98,3 @@ export class WalletUI {
     }
 
 }
-
-
-
-    // constructor() {
-    //     console.log("WalletConnection constructor");
-    //     // When the page is about to be unloaded, save the state of the wallet
-    //     window.onbeforeunload = () => {
-    //         console.log("Saving state: " + this.address + " " + this.isConnected)
-    //         if (this.isConnected) {
-    //             localStorage.setItem('WalletConnection', JSON.stringify({ address: this.address }));
-    //         }
-    //     }
-
-    //     // When the page is loaded, restore the state of the wallet
-    //     const savedState = localStorage.getItem('WalletConnection');
-    //     console.log("Saved state: " + savedState);
-    //     if (savedState) {
-    //         const state = JSON.parse(savedState);
-    //         this.address = state.address;
-    //     }
-    // }

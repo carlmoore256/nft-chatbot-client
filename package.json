@@ -1,5 +1,6 @@
 {
   "devDependencies": {
+    "cheerio": "^1.0.0-rc.12",
     "cssnano": "^6.0.1",
     "postcss": "^8.4.25"
   },
@@ -72,8 +73,9 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "bundle" : "parcel build index.html --public-url ./",
-    "dev": "npx parcel index.html --open"
+    "bundle": "parcel build index.html --public-url ./",
+    "dev": "npx parcel index.html --open",
+    "package": "node ./scripts/package.js"
   },
   "author": "",
   "license": "ISC",
